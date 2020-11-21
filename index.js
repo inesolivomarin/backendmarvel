@@ -21,6 +21,10 @@ mongoose.connect("", {
   useCreateIndex: true,
 });
 
+app.all("/", (req, res) => {
+  res.json({ message: "Welcome" });
+});
+
 app.get("/comics", async (req, res) => {
   try {
     // Générer le ts
@@ -30,7 +34,7 @@ app.get("/comics", async (req, res) => {
     const response = await axios.get(
       `http://gateway.marvel.com/v1/public/comics?ts=${ts}&apikey=${publicKey}&hash=${hash}`
     );
-    res.json(response.data.data);
+    return res.json(response.data);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -44,10 +48,14 @@ app.get("/caracters", async (req, res) => {
     const response = await axios.get(
       `http://gateway.marvel.com/v1/public/characters?ts=${ts}&apikey=${publicKey}&hash=${hash}`
     );
-    res.json(response.data.data);
+    return res.json(response.data);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+});
+
+app.all("*", (req, res) => {
+  res.status(404).json({ message: "This road doesn't exist" });
 });
 
 app.listen(process.env.PORT, () => {
